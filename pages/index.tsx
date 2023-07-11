@@ -1,32 +1,59 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios, { AxiosResponse } from 'axios';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Link from '../src/Link';
-import ProTip from '../src/ProTip';
-import Copyright from '../src/Copyright';
+import { CitiesTable, Chart } from '../components';
+import { CITIES } from '../constants/cities';
+import { Weather } from '../api/weather';
+import { WeatherData } from '../types/common';
 
 export default function Home() {
+  const [weatherData, setWeatherData] = useState<WeatherData[]>([]);
+  const [selectedCity, setSelectedCity] = useState<string>('');
+
+  const getDataFromPromisesArr = async (promises: Promise<AxiosResponse>[]) => {
+    try {
+      const data = await axios.all(promises);
+      return data.map((response) => {
+        const { config: { params }, data } = response;
+
+        return { ...data, country: params.country, city: params.city };
+      });
+    } catch (error) {
+      console.log("___________error", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const promises = CITIES.map((params) => Weather.getTemperatureAndWind(params));
+
+    const fetchData = async () => {
+      const res = await getDataFromPromisesArr(promises);
+      setWeatherData(res);
+    };
+
+    fetchData();
+  }, []);
+
   return (
-    <Container maxWidth="lg">
-      <Box
-        sx={{
-          my: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Typography variant="h4" component="h1" gutterBottom>
-          Material UI - Next.js example in TypeScript
-        </Typography>
-        <Link href="/about" color="secondary">
-          Go to the about page
-        </Link>
-        <ProTip />
-        <Copyright />
-      </Box>
+    <Container
+      maxWidth="xl"
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Chart
+        weatherData={weatherData}
+        selectedCity={selectedCity}
+      />
+      <CitiesTable
+        weatherData={weatherData}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
+      />
     </Container>
   );
 }
