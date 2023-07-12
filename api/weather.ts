@@ -9,5 +9,5 @@ type WeatherParams = {
 };
 
 export const Weather = {
-    getTemperatureAndWind: (params: WeatherParams) => get(`/v1/forecast`, {params}),
+    getTemperatureAndWind: (params: WeatherParams) => get(`/v1/forecast`, { params }),
 }

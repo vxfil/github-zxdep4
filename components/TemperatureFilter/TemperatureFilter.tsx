@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import TextField from '@mui/material/TextField';
-import { TemperatureFilterProps } from '../../types/temperatureFilters';
+
+export interface TemperatureFilterProps {
+  placeholder?: string;
+  onChange: (value: string) => void;
+  value: string;
+  maxValue?: number;
+  minValue?: number;
+}
 
 const TemperatureFilter: React.FC<TemperatureFilterProps> = (props) => {
   const { placeholder, onChange, value, maxValue, minValue } = props;

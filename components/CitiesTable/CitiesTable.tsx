@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Dispatch, SetStateAction } from 'react';
 import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -10,9 +10,42 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
-import { CitiesTableProps, Filter, Order } from '../../types/citiesTable';
-import { HeadCell, Data, EnhancedTableProps } from '../../interfaces/citiesTable';
-import { CountriesFilter, TemperatureFilter } from '../../components';
+import { CountriesFilter, TemperatureFilter, TableRowsLoader } from '../../components';
+import { WeatherData } from '../../common';
+
+type CitiesTableProps = {
+  weatherData: WeatherData[];
+  selectedCity: string;
+  setSelectedCity: Dispatch<SetStateAction<string>>;
+  loading: boolean;
+};
+
+type Filter = {
+  isTriggered: boolean;
+  filterFunc: (data: Data[]) => Data[];
+};
+
+type Order = 'asc' | 'desc';
+interface Data {
+  windDirection: number;
+  maxTemp: number;
+  minTemp: number;
+  city: string;
+  country: string;
+}
+
+interface HeadCell {
+  disablePadding: boolean;
+  id: keyof Data;
+  label: string;
+  numeric: boolean;
+}
+
+interface EnhancedTableProps {
+  onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
+  order: Order;
+  orderBy: string;
+}
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -132,7 +165,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 }
 
 const CitiesTable: React.FC<CitiesTableProps> = (props) => {
-  const { weatherData, selectedCity, setSelectedCity } = props;
+  const { weatherData, selectedCity, setSelectedCity, loading } = props;
 
   const rows = weatherData.map(({ city, country, daily, current_weather }) => {
     const { temperature_2m_max, temperature_2m_min } = daily;
@@ -250,11 +283,12 @@ const CitiesTable: React.FC<CitiesTableProps> = (props) => {
           minValue={minTempFilter}
         />
       </Box>
-      <Paper sx={{ width: '100%', backgroundColor: 'initial' }}>
+      <Paper sx={{ width: '100%', backgroundColor: 'initial', overflowX: "auto" }}>
         <TableContainer sx={{ borderRadius: '12px', border: '1px solid #313131' }}>
           <Table
             aria-labelledby="tableTitle"
             size='small'
+            sx={{ minWidth: 607 }}
           >
             <EnhancedTableHead
               order={order}
@@ -262,54 +296,56 @@ const CitiesTable: React.FC<CitiesTableProps> = (props) => {
               onRequestSort={handleRequestSort}
             />
             <TableBody>
-              {visibleRows.map((row, index) => {
-                const labelId = `enhanced-table-checkbox-${index}`;
+              {loading ?
+                <TableRowsLoader rowsNum={8} cellsNum={4} />
+                : visibleRows.map((row, index) => {
+                  const labelId = `enhanced-table-checkbox-${index}`;
 
-                return (
-                  <TableRow
-                    onClick={(event) => handleClick(event, `${row.city}`)}
-                    selected={row.city === selectedCity}
-                    key={row.city}
-                    sx={{
-                      cursor: 'pointer',
-                      background: '#313131',
-                      height: 36,
-
-                      '&:hover': {
-                        background: 'rgba(85, 108, 214, 0.12)',
-                      },
-
-                      "&:nth-child(odd)": {
-                        background: '#191919',
+                  return (
+                    <TableRow
+                      onClick={(event) => handleClick(event, `${row.city}`)}
+                      selected={row.city === selectedCity}
+                      key={row.city}
+                      sx={{
+                        cursor: 'pointer',
+                        background: '#313131',
+                        height: 36,
 
                         '&:hover': {
-                          background: 'rgba(85, 108, 214, 0.04)',
+                          background: 'rgba(85, 108, 214, 0.12)',
                         },
 
-                        '&.Mui-selected': {
-                          background: 'rgba(85, 108, 214, 0.08)',
-                        }
-                      },
+                        "&:nth-child(odd)": {
+                          background: '#191919',
 
-                      '& .MuiTableCell-root': {
-                        color: '#FDFCFF',
-                        border: 'none',
-                      },
-                    }}
-                  >
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
+                          '&:hover': {
+                            background: 'rgba(85, 108, 214, 0.04)',
+                          },
+
+                          '&.Mui-selected': {
+                            background: 'rgba(85, 108, 214, 0.08)',
+                          }
+                        },
+
+                        '& .MuiTableCell-root': {
+                          color: '#FDFCFF',
+                          border: 'none',
+                        },
+                      }}
                     >
-                      {row.city}
-                    </TableCell>
-                    <TableCell align="right">{row.maxTemp}</TableCell>
-                    <TableCell align="right">{row.minTemp}</TableCell>
-                    <TableCell align="right">{row.windDirection}</TableCell>
-                  </TableRow>
-                );
-              })}
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                      >
+                        {row.city}
+                      </TableCell>
+                      <TableCell align="right">{row.maxTemp}</TableCell>
+                      <TableCell align="right">{row.minTemp}</TableCell>
+                      <TableCell align="right">{row.windDirection}</TableCell>
+                    </TableRow>
+                  );
+                })}
               {emptyRows > 0 && (
                 <TableRow
                   style={{
