@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import Container from '@mui/material/Container';
-import { CitiesTable, Chart } from '../components';
+import { CitiesTable, Chart, Loader } from '../components';
 import { CITIES } from '../constants/cities';
 import { Weather } from '../api/weather';
 import { WeatherData } from '../types/common';
@@ -45,6 +45,7 @@ export default function Home() {
         alignItems: 'center',
       }}
     >
+      <Loader />
       <Chart
         weatherData={weatherData}
         selectedCity={selectedCity}

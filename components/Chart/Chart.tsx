@@ -126,7 +126,7 @@ const Chart: React.FC<ChartProps> = (props) => {
                             left: 0,
                             bottom: 12,
                         }}
-                        barCategoryGap="80%"
+                        barCategoryGap="78%"
                     >
                         <defs>
                             <linearGradient
@@ -138,7 +138,7 @@ const Chart: React.FC<ChartProps> = (props) => {
                                 spreadMethod="reflect"
                             >
                                 <stop offset="0" stopColor="#B3FC4F" />
-                                <stop offset="1" stopColor="#173102" />
+                                <stop offset="100%" stopColor="#173102" />
                             </linearGradient>
                         </defs>
                         <CartesianGrid vertical={false}
