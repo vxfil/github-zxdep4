@@ -3,7 +3,7 @@
 ## How to use
 
 ```bash
-1. clone repo
-2. npm install
-3. npm run dev
+1. Сlone repo
+2. Go to the folder with the project and install the dependencies using the command **npm install**
+3. Run the project using the command **npm run dev**
 ```
