@@ -2,8 +2,7 @@
 
 ## How to use
 
-```bash
-1. Сlone repo
-2. Go to the folder with the project and install the dependencies using the command **npm install**
-3. Run the project using the command **npm run dev**
-```
+1. Clone the repository to your local machine.
+2. Navigate to the project folder in your terminal or command prompt.
+3. Install the necessary dependencies by running the command **npm install**.
+4. Once the installation is complete, start the project using the command **npm run dev**.
